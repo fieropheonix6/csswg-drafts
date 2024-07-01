@@ -2159,6 +2159,7 @@ HSL Colors: ''hsl()'' and ''hsla()'' functions</h2>
 		hsl-006.html
 		hsl-007.html
 		hsl-008.html
+		hsl-clamp-negative-saturation.html
 		background-color-hsl-001.html
 		background-color-hsl-002.html
 		background-color-hsl-003.html
@@ -2190,7 +2191,6 @@ HSL Colors: ''hsl()'' and ''hsla()'' functions</h2>
 	before being converted to an sRGB color.
 
 	<wpt>
-		t424-hsl-clip-outside-gamut-b.xht
 		parsing/color-valid-hsl.html
 	</wpt>
 
@@ -2310,6 +2310,7 @@ HSL Colors: ''hsl()'' and ''hsla()'' functions</h2>
 		hsla-006.html
 		hsla-007.html
 		hsla-008.html
+		hsla-clamp-negative-saturation.html
 		parsing/color-valid.html
 	</wpt>
 
@@ -4298,7 +4299,7 @@ The Predefined CIE XYZ Color Spaces: the ''xyz-d50'', ''xyz-d65'', and ''xyz'' k
 				the reference white for ''xyz-d65''  and ''xyz'' is [=D65=].
 
 				Values greater than 1.0/100% are allowed and must not be clamped;
-				they represent colors brighter than diffuse white.
+				colors where Y is greater than 1.0 represent colors brighter than diffuse white.
 				Values less than 0/0% are uncommon,
 				but can occur as a result of chromatic adaptation,
 				and likewise must not be clamped.
@@ -4325,6 +4326,16 @@ The Predefined CIE XYZ Color Spaces: the ''xyz-d50'', ''xyz-d65'', and ''xyz'' k
 						<span class="swatch" style="--color: #7654CD"></span> lab(44.36% 36.05 -58.99)
 						<span class="swatch" style="--color: #7654CD"></span> color(xyz-d50 0.2005 0.14089 0.4472)
 						<span class="swatch" style="--color: #7654CD"></span> color(xyz-d65 0.21661 0.14602 0.59452)
+					</pre>
+				</div>
+
+				<div class="example" id="ex-xyz-white">
+					These colors are exactly equivalent, and represent white:
+
+					<pre class="lang-css">
+						<span class="swatch" style="--color: #FFFFFF"></span> #FFFFFF
+						<span class="swatch" style="--color: #FFFFFF"></span> color(xyz-d50 0.9643 1 0.8251)
+						<span class="swatch" style="--color: #FFFFFF"></span> color(xyz-d65 0.9505 1 1.089)
 					</pre>
 				</div>
 
@@ -4575,7 +4586,7 @@ Color Interpolation</h2>
 			If one or both colors are already in the interpolation colorspace,
 			this conversion changes any [=powerless=] components to [=missing=] values
 		</li>
-		<li>(if required) re-inserting [=carried-forward=] values in the converted colors</li>
+		<li>(if required) re-inserting [=carried forward=] values in the converted colors</li>
 		<li>(if required) fixing up the hues, depending on the selected <<hue-interpolation-method>></li>
 		<li>changing the color components to premultiplied form</li>
 		<li>linearly interpolating each component of the computed value of the color separately</li>
@@ -5504,7 +5515,7 @@ Deviations from Perceptual Uniformity: Hue Curvature</h4>
 <h3 id="css-gamut-mapping" algorithm="to CSS gamut map">
 CSS Gamut Mapping to an RGB Destination</h3>
 
-<wpt title="Used values of color are not exposed to script, making this hard to test in an automated manner."></wpt>
+<wpt title="Actual values of color are not exposed to script, making this hard to test in an automated manner."></wpt>
 
 	The <dfn export>CSS gamut mapping algorithm</dfn>
 	applies to individual,
@@ -6931,7 +6942,6 @@ at-color-profile-001.html
 color-mix-currentcolor-001.html
 color-mix-currentcolor-002.html
 color-mix-currentcolor-003.html
-color-contrast-001.html
 color-mix-basic-001.html
 color-mix-non-srgb-001.html
 color-mix-percents-01.html
@@ -6968,7 +6978,6 @@ t422-rgba-values-meaning-b.xht
 t423-transparent-1-a.xht
 t423-transparent-2-a.xht
 t424-hsl-basic-a.xht
-t424-hsl-clip-outside-gamut-b.xht
 t424-hsl-h-rotating-b.xht
 t424-hsl-parsing-f.xht
 t424-hsl-values-b-1.html
@@ -6987,7 +6996,6 @@ t424-hsl-values-b-7.html
 t424-hsl-values-b-8.html
 t424-hsl-values-b-9.html
 t425-hsla-basic-a.xht
-t425-hsla-clip-outside-device-gamut-b.xht
 t425-hsla-h-rotating-b.xht
 t425-hsla-parsing-f.xht
 t425-hsla-values-b.xht
@@ -7027,9 +7035,6 @@ parsing/color-valid-color-mix-function.html
 parsing/color-computed-relative-color.html
 parsing/color-invalid-relative-color.html
 parsing/color-valid-relative-color.html
-parsing/color-computed-color-contrast-function.html
-parsing/color-invalid-color-contrast-function.html
-parsing/color-valid-color-contrast-function.html
 parsing/relative-color-out-of-gamut.html
 </wpt>
 
@@ -7049,7 +7054,22 @@ Changes</h2>
 <h3 id="changes-from-20240213">Changes since the <a href="https://www.w3.org/TR/2024/CRD-css-color-4-20240213/">Candidate Recommendation Draft of 13 Feb 2024</a></h3>
 
 <ul>
-	<li><i>none</i></li>
+	<!-- to 21 June -->
+	<li>Added another  xyz-d65 and xyz-d50 example</li>
+	<li>Clarify which component (Y) in XYZ corresponds to brightness</li>
+	<li>Clarified that CSS gamut mapping applies on actual, not used, values</li>
+	<li>Removed hue normalization from the hslToRgb sample code, as the input is already normalized at parse time</li>
+	<li>Corrected the pseudo-code for step 4 of the gamut mapping algorithm</li>
+	<li>Clarified that interpolation is the most common situation which combines two colors, but not the only one. </li>
+	<li>Ensured adequate contrast for text in the deltaE table</li>
+	<li>Removed remaining use of the term &lt;absolute-color-function>, use &lt;absolute-color> function instead for consistency</li>
+	<li>Updated acknowledgements section</li>
+	<li>Added gamut mesh diagram</li>
+	<li>Described CSSOM serialization in terms of declared values rather than specified values</li>
+	<li>Added exported definition of luminance</li>
+	<li>Added production rule for &lt;opacity-value> </li>
+	<li>Clarified when results from hslToRgb will be in [0,1]</li>
+	<li>Clarified that once linearized, RGB spaces are additive</li>
 </ul>
 
 <h3 id="changes-from-20221101">Changes since the
